@@ -35,8 +35,13 @@
 - [x] Webhook service
 - [x] Remove reminder limit for paid users (already enforced in Phase 3)
 
+## Dev Shortcuts (remove before production)
+- [x] Plan toggle button in nav bar — replace with Stripe Checkout
+- [x] "Send notifications" button on dashboard — remove once email is production-ready
+- [x] Mailtrap SMTP for email testing — switch to a production email provider (e.g. SendGrid, SES)
+
 ## Future — Payments & Deferred
-- [ ] Stripe Checkout integration (replace dev toggle with real payments)
+- [ ] Stripe Checkout integration (replace dev plan toggle with real payments)
 - [ ] SMS service (Twilio stub)
 
 ## Phase 6 — Polish
