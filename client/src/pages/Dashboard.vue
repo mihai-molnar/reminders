@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import ReminderList from '../components/ReminderList.vue'
 import ReminderForm from '../components/ReminderForm.vue'
+import api from '../lib/api'
 
 const store = useRemindersStore()
 const auth = useAuthStore()
@@ -13,6 +14,18 @@ const router = useRouter()
 const showForm = ref(false)
 const editing = ref(null)
 const error = ref('')
+const triggerMsg = ref('')
+
+async function triggerNotifications() {
+  triggerMsg.value = 'Sending...'
+  try {
+    await api.post('/notifications/trigger')
+    triggerMsg.value = 'Done — check Mailtrap'
+  } catch {
+    triggerMsg.value = 'Failed'
+  }
+  setTimeout(() => { triggerMsg.value = '' }, 3000)
+}
 
 onMounted(() => {
   if (!auth.isLoggedIn) {
@@ -66,10 +79,17 @@ function cancelEdit() {
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-      <button v-if="!showForm && !editing" @click="showForm = true"
-        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-        + New Reminder
-      </button>
+      <div class="flex items-center gap-2">
+        <button @click="triggerNotifications"
+          class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
+          Send notifications
+        </button>
+        <span v-if="triggerMsg" class="text-xs text-gray-500">{{ triggerMsg }}</span>
+        <button v-if="!showForm && !editing" @click="showForm = true"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+          + New Reminder
+        </button>
+      </div>
     </div>
 
     <p v-if="error" class="mb-4 text-red-600 text-sm bg-red-50 border border-red-200 rounded p-3">{{ error }}</p>
