@@ -38,10 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function togglePlan() {
-    const res = await api.post('/auth/toggle-plan')
-    user.value = res.data.user
+  async function upgradeToPaid() {
+    const res = await api.post('/payments/create-checkout-session')
+    window.location.href = res.data.url
   }
 
-  return { user, token, isLoggedIn, login, register, logout, fetchUser, togglePlan }
+  return { user, token, isLoggedIn, login, register, logout, fetchUser, upgradeToPaid }
 })

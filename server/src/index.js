@@ -11,7 +11,14 @@ const db = knex(knexConfig);
 
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+// Skip JSON parsing for Stripe webhook (needs raw body for signature verification)
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/payments/webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 // Make db accessible to routes
 app.use((req, res, next) => {
@@ -27,6 +34,7 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reminders', require('./routes/reminders'));
+app.use('/api/payments', require('./routes/payments'));
 
 // POST /api/notifications/trigger — manually run the scheduler (dev only)
 app.post('/api/notifications/trigger', async (req, res) => {

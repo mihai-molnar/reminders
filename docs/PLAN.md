@@ -10,6 +10,7 @@ Built-in reminder apps are weak for recurring, long-term tasks (water filter cha
 - **Backend:** Node.js + Express
 - **Database:** SQLite (via Knex.js with migrations)
 - **Auth:** Email/password + JWT
+- **Payments:** Stripe Checkout (one-time payment for paid plan upgrade)
 - **Structure:** Monorepo — `/client` and `/server`
 
 ---
@@ -33,6 +34,7 @@ recurring-reminders/
 │   │   │   ├── Register.vue
 │   │   │   ├── Settings.vue
 │   │   │   ├── ReminderDetail.vue
+│   │   │   ├── UpgradeSuccess.vue   # post-checkout landing
 │   │   │   └── History.vue          # paid
 │   │   ├── stores/
 │   │   │   ├── auth.js
@@ -51,6 +53,7 @@ recurring-reminders/
 │   │   ├── routes/
 │   │   │   ├── auth.js
 │   │   │   ├── reminders.js
+│   │   │   ├── payments.js              # Stripe Checkout + webhook
 │   │   │   └── notifications.js
 │   │   ├── middleware/
 │   │   │   └── auth.js               # JWT verification
@@ -82,6 +85,7 @@ recurring-reminders/
 | email | TEXT | unique, not null |
 | password_hash | TEXT | bcrypt |
 | plan | TEXT | 'free' or 'paid', default 'free' |
+| stripe_customer_id | TEXT | nullable, unique |
 | created_at | DATETIME | default now |
 
 ### reminders
@@ -138,6 +142,10 @@ recurring-reminders/
 ### History (paid)
 - `GET /api/reminders/:id/history` — completion history
 
+### Payments
+- `POST /api/payments/create-checkout-session` — creates Stripe Checkout session, returns URL
+- `POST /api/payments/webhook` — Stripe webhook handler (verifies signature, upgrades user on checkout.session.completed)
+
 ### Settings
 - `PUT /api/settings/profile` — update email/password
 - `PUT /api/settings/notifications` — default notification prefs
@@ -172,6 +180,7 @@ The scheduler (node-cron) runs every hour:
 - `node-cron` — scheduler
 - `nodemailer` — email
 - `express-validator` — input validation
+- `stripe` — Stripe Checkout + webhooks
 - `cors`, `helmet`, `dotenv`
 
 ### Client
@@ -216,6 +225,11 @@ The scheduler (node-cron) runs every hour:
 20. Webhook service
 21. Remove reminder limit for paid users
 
+### Payments — Stripe Checkout
+22. Stripe Checkout integration (create-checkout-session + webhook endpoints)
+23. Upgrade success page in frontend
+24. Replace dev plan toggle with real Upgrade button
+
 ### Phase 6 — Polish
 22. Responsive UI pass
 23. Error handling + loading states
@@ -233,3 +247,4 @@ The scheduler (node-cron) runs every hour:
 5. **Scheduler:** Run scheduler manually → sends test email for due reminders
 6. **Free limit:** Create 6th reminder on free plan → gets rejected
 7. **History (paid):** Complete a reminder → appears in history log
+8. **Stripe upgrade:** Click Upgrade → complete Stripe Checkout with test card 4242... → redirected to success page → plan shows "Paid plan"

@@ -62,18 +62,6 @@ router.post('/login', validate, async (req, res) => {
   });
 });
 
-// POST /api/auth/toggle-plan (dev only — swap between free/paid)
-router.post('/toggle-plan', authenticateToken, async (req, res) => {
-  const db = req.db;
-  const user = await db('users').where({ id: req.userId }).first();
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  const newPlan = user.plan === 'free' ? 'paid' : 'free';
-  await db('users').where({ id: req.userId }).update({ plan: newPlan });
-
-  res.json({ user: { id: user.id, email: user.email, plan: newPlan } });
-});
-
 // GET /api/auth/me
 router.get('/me', authenticateToken, async (req, res) => {
   const db = req.db;

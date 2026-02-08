@@ -18,14 +18,14 @@ function logout() {
       <div class="flex items-center gap-4">
         <template v-if="auth.isLoggedIn">
           <span class="text-sm text-gray-600">{{ auth.user?.email }}</span>
-          <button @click="auth.togglePlan()"
-            class="text-xs px-2 py-0.5 rounded-full font-medium"
-            :class="auth.user?.plan === 'paid'
-              ? 'bg-green-100 text-green-700 hover:bg-green-200'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-          >
-            {{ auth.user?.plan }} plan
+          <button v-if="auth.user?.plan === 'free'" @click="auth.upgradeToPaid()"
+            class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700 hover:bg-blue-200">
+            Upgrade
           </button>
+          <span v-else
+            class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
+            Paid plan
+          </span>
           <button @click="logout" class="text-sm text-red-600 hover:underline">Logout</button>
         </template>
         <template v-else>
